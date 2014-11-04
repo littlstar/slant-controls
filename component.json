@@ -1,0 +1,16 @@
+{
+  "name": "slant-controls",
+  "version": "0.0.1",
+  "description": "Core video controls API for slant",
+  "scripts": ["index.js"],
+  "styles": ["controls.css"],
+  "templates": ["template.html"],
+  "dependencies": {
+    "component/emitter": "*",
+    "component/events": "*",
+    "component/domify": "*"
+  },
+  "development": {
+    "littlstar/slant-frame": "*"
+  }
+}

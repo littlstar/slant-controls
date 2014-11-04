@@ -1,0 +1,11 @@
+
+.slant.controls {
+  display: block;
+  position: : relative;
+}
+
+.slant.controls ul {
+  display: block;
+  position: : relative;
+  list-style: none;
+}

@@ -1,0 +1,31 @@
+<!doctype>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="build/build.css" type="text/css" />
+    <script type="text/javascript" charset="utf-8" src="build/build.js"></script>
+    <style type="text/css" media="all">
+      #video {
+        display: block;
+        position: relative;
+        width: 1000px;
+        height: 500px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="video"></div>
+    <script type="text/javascript" charset="utf-8">
+      var el = document.querySelector('#video');
+      var Frame = require('slant-frame');
+      var Controls = require('slant-controls');
+
+      var frame = new Frame(el, {src: 'test.webm'});
+      var controls = new Controls(frame, {});
+
+      el.appendChild(controls.el);
+    </script>
+  </body>
+</html>
