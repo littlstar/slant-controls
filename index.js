@@ -7,6 +7,52 @@ var tpl = require('./template.html')
   , dom = require('domify')
   , events = require('events')
   , emitter = require('emitter')
+  , drag = require('drag')
+  , raf = require('raf')
+
+var int = parseInt;
+var float = parseFloat;
+
+function parseDuration (seconds) {
+  var h = int(seconds / (60 * 60));
+  var m = int(seconds / 60);
+  var s = int((m / 60) || seconds);
+  var ms = int(s * 1000);
+  return {
+    hours: h,
+    minutes: m,
+    seconds: s,
+    milliseconds: ms
+  };
+}
+
+function formatDuration (duration, format) {
+  var h = duration.hours;
+  var m = duration.minutes;
+  var s = duration.seconds;
+  var ms = duration.milliseconds;
+
+  format = format || 'm:s';
+
+  function pad (n) {
+    return String(n < 10 ? '0'+n : n);
+  }
+
+  h = pad(h);
+  m = pad(m);
+  s = pad(s);
+  ms = pad(ms);
+
+  return format.split(':').map(function (k) {
+    switch (k) {
+      case 'h': return h;
+      case 'm': return m;
+      case 's': return s;
+      case 'ms': return ms;
+      default: return null;
+    }
+  }).filter(Boolean).join(':');
+}
 
 /**
  * `Controls' constructor
@@ -22,20 +68,167 @@ function Controls (frame, opts) {
     return new Controls(frame, opts);
   }
 
+  opts = opts || {};
+
+  var self = this;
+
   this.frame = frame;
   this.el = dom(tpl);
+  this.scrubbing = false;
+  this.ready = false;
   this.muted = frame.video.muted;
   this.events = events(this.el, this);
+  this.events.bind('click', 'onclick');
+
+  // play/pause handles
   this.events.bind('click .playpause .play', 'onplayclick');
   this.events.bind('click .playpause .pause', 'onplayclick');
-  this.events.bind('click .volume .control', 'onvolumeclick');
+
+  // track scrubbing
+  this.events.bind('click .progress .played', 'onscrubclick');
+  this.events.bind('click .progress .loaded', 'onscrubclick');
+
+  // volume control
+  this.events.bind('click .volume .control', 'onmuteclick');
+  this.events.bind('mouseover .volume', 'onvolumefocus');
+  this.events.bind('mouseout .volume', 'onvolumeblur');
+
+  var progress = this.el.querySelector('.progress');
+  var played = progress.querySelector('.played');
+  var loaded = progress.querySelector('.loaded');
+  var scrub = progress.querySelector('.scrub');
+
+  var time = this.el.querySelector('.time');
+  var current = time.querySelector('.current');
+  var duration = time.querySelector('.duration');
+
+  var volume = this.el.querySelector('.volume');
+  var volumeControl = volume.querySelector('.control');
+  var volumePanel = volume.querySelector('.panel');
+  var volumeSlider = volume.querySelector('.slider');
+  var volumeHandle = volume.querySelector('.handle');
+
+  this.vol = drag(volumeHandle, {
+    smooth: true,
+    range: {x: [0, 100]},
+    axis: 'x'
+  });
+
+  this.scrub = drag(scrub, {
+    smooth: true,
+    range: {x: [0, 100]},
+    axis: 'x'
+  });
+
+  if (opts.separator) {
+    time.querySelector('.separator').innerHTML = opts.separator;
+  }
+
+  this.scrub.on('dragstart', function (e) {
+    self.scrubbing = true;
+    self.emit('scrubstart', e);
+  });
+
+  this.scrub.on('drag', function (e) {
+    self.scrubbing = true;
+    self.emit('scrub', e);
+  });
+
+  this.vol.on('drag', function (e) {
+    var x = self.vol.x;
+    var w = float(getComputedStyle(volumeSlider, null).width);
+    var p = x / w;
+    self.frame.volume(p);
+    self.emit('volume');
+  });
+
+  this.scrub.on('dragend', function (e) {
+    var x = self.scrub.x;
+    var w = float(getComputedStyle(scrub.parentElement, null).width);
+    var d = self.frame.video.duration;
+    var p = x / w;
+    var s = d * p;
+
+    self.scrubbing = false;
+    self.seek(s);
+    self.emit('scrubend', e);
+  });
+
+  this.frame.on('ready', function () {
+    var dur = null;
+
+    // format current time
+    dur = parseDuration(self.frame.state.time);
+    current.innerHTML = formatDuration(dur);
+
+    // format total duration
+    dur = parseDuration(self.frame.state.duration);
+    duration.innerHTML = formatDuration(dur);
+
+    // update volume handle range
+    self.vol.range.x[1] = float(getComputedStyle(volumeSlider).width);
+
+    self.vol.setPosition(
+      float(getComputedStyle(volumeSlider).width) * self.frame.video.volume,
+      0
+    );
+
+    self.ready = true;
+    self.emit('ready');
+  });
+
+  this.frame.on('progress', function (e) {
+    var x = 0;
+
+    // update progress bar
+    loaded.style.width = e.percent + '%';
+
+    // new scrub range
+    x = loaded.offsetWidth;
+
+    // update scrub range
+    self.scrub.range.x[1] = x;
+  });
+
+  this.frame.on('timeupdate', function (e) {
+    var dur = parseDuration(self.frame.state.time);
+    var x = 0;
+
+    // update current time
+    current.innerHTML = formatDuration(dur);
+
+    // update played progress bar
+    played.style.width = e.percent + '%';
+
+    // get current x position for scrubber
+    x = played.offsetWidth - 2; //
+
+    if (false == self.scrubbing) {
+      // update scrub position
+      self.scrub.setPosition(x, 0);
+    }
+  });
 }
 
 // inherit from emitter
 emitter(Controls.prototype);
 
 /**
- * `onplayclick' event handler
+ * `onclick' event handler
+ *
+ * @api private
+ * @param {Event} e
+ */
+
+Controls.prototype.onclick = function (e) {
+  e.preventDefault();
+  this.scrubbing = false;
+};
+
+
+/**
+ * `onplayclick' event handler. Handles toggling play
+ * and pause buttons
  *
  * @api private
  * @param {Event} e
@@ -43,31 +236,77 @@ emitter(Controls.prototype);
 
 Controls.prototype.onplayclick = function (e) {
   var play = this.el.querySelector('.play');
-  var paused = Boolean(this.frame.video.pause);
+  var paused = Boolean(this.frame.video.paused);
   e.preventDefault();
 
-  if (true == paused) {
-    play.classList.remove('pause');
-  } else {
-    play.classList.add('pause');
-  }
-
   this.toggle();
+  this.paused = Boolean(this.frame.video.paused);
 };
 
 /**
- * `onvolumeclick' event handler
+ * `onmuteclick' event handler
  *
  * @api private
  * @param {Event} e
  */
 
-Controls.prototype.onvolumeclick = function (e) {
+Controls.prototype.onmuteclick = function (e) {
+  var el = this.el.querySelector('.volume .control');
   if (this.muted) {
+    el.classList.remove('muted');
     this.muted = false;
   } else {
+    el.classList.add('muted');
     this.muted = true;
   }
+};
+
+/**
+ * `onvolumefocus' event handler
+ *
+ * @api private
+ * @param {Event} e
+ */
+
+Controls.prototype.onvolumefocus = function (e) {
+  var panel = this.el.querySelector('.volume .panel');
+  //panel.classList.remove('hidden');
+};
+
+/**
+ * `onvolumeblur' event handler
+ *
+ * @api private
+ * @param {Event} e
+ */
+
+Controls.prototype.onvolumeblur = function (e) {
+  var vol = this.el.querySelector('.volume');
+  var panel = vol.querySelector('.panel');
+  if (false == vol.contains(e.target) && vol != e.target) {
+    raf(function () {
+      //panel.classList.add('hidden');
+    });
+  }
+};
+
+/**
+ * `onscrubclick' event handler
+ *
+ * @api private
+ * @param {Event} e
+ */
+
+Controls.prototype.onscrubclick = function (e) {
+  var x = e.offsetX;
+  var w = float(getComputedStyle(e.target.parentElement, null).width);
+  var d = this.frame.video.duration;
+  var p = x / w;
+  var s = d * p;
+
+  this.scrubbing = false;
+  this.seek(s);
+  this.emit('scrubend', e);
 };
 
 /**
@@ -163,5 +402,97 @@ Controls.prototype.mute = function () {
 
 Controls.prototype.unmute = function () {
   this.frame.unmute();
+  return this;
+};
+
+/**
+ * Seek frame in seconds
+ *
+ * @api public
+ * @param {Number} seconds
+ */
+
+Controls.prototype.seek = function (seconds) {
+  this.frame.seek(seconds);
+  return this;
+};
+
+/**
+ * Fast forward frame in seconds
+ *
+ * @api public
+ * @param {Number} seconds
+ */
+
+Controls.prototype.forward = function (seconds) {
+  this.frame.forward(seconds);
+  return this;
+};
+
+/**
+ * Rewind frame in seconds
+ *
+ * @api public
+ * @param {Number} seconds
+ */
+
+Controls.prototype.rewind = function (seconds) {
+  this.frame.rewind(seconds);
+  return this;
+};
+
+/**
+ * Installs plugin
+ *
+ * @api public
+ * @param {Function} fn
+ */
+
+Controls.prototype.use = function (fn) {
+  if (this.ready) {
+    fn(this);
+  } else {
+    this.on('ready', function () {
+      fn(this);
+    });
+  }
+  return this;
+};
+
+/**
+ * Show controls
+ *
+ * @api public
+ */
+
+Controls.prototype.show = function () {
+  var self = this;
+  raf(function () {
+    self.el.classList.remove('hidden');
+    self.el.classList.add('fadeIn');
+    self.el.classList.remove('fadeOut');
+    self.emit('show');
+  });
+  return this;
+};
+
+/**
+ * Hide controls
+ *
+ * @api public
+ */
+
+Controls.prototype.hide = function () {
+  var self = this;
+  raf(function () {
+    self.el.classList.remove('fadeIn');
+    self.el.classList.add('fadeOut');
+
+    // defer hiding visiblity for animations
+    setTimeout(function () {
+      self.el.classList.add('hidden');
+      self.emit('hide');
+    });
+  });
   return this;
 };

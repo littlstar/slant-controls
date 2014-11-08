@@ -1,11 +1,188 @@
 
+@-webkit-keyframes fadeIn {
+    0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-webkit-keyframes fadeOut {
+    0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.slant, .slant * {
+  -webkit-animation-duration: 0.5s;
+  -webkit-animation-fill-mode: both;
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+.slant .fadeIn,
+.slant.fadeIn {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
+.slant.fadeOut,
+.slant .fadeOut {
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+}
+
 .slant.controls {
   display: block;
-  position: : relative;
+  position: relative;
+  bottom: 50px;
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: 100;
+  font-family: Helvetica;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.slant.controls .hidden {
+  display: none !important;
 }
 
 .slant.controls ul {
   display: block;
-  position: : relative;
+  position: relative;
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
+
+.slant.controls ul li {
+  display: inline-block;
+  position: relative;
+}
+
+.slant.controls ul li.playpause {
+  vertical-align: middle;
+}
+
+.slant.controls ul li.playpause a {
+  display: block;
+  position: relative;
+  width: 40px;
+  height: auto;
+  padding: 10px 5px;
+  vertical-align: middle;
+  color: #fff;
+  font-weight: 100;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.slant.controls ul li.playpause a.pause {
+  font-size: 18px;
+  text-align: right;
+}
+
+.slant.controls ul li.progress {
+  width: 70%;
+  margin: 0;
+  margin-right: 5px;
+}
+
+.slant.controls ul li.progress .bar {
+  display: block;
+  position: relative;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.slant.controls ul li.progress .bar .gutter {
+}
+
+.slant.controls ul li.progress .bar .played {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  cursor: pointer;
+  background: rgb(226, 226, 255);
+}
+
+.slant.controls ul li.progress .bar .loaded {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  cursor: pointer;
+  background: #4d4d4d;
+}
+
+.slant.controls ul li.progress .scrub {
+  display: block;
+  position: absolute;
+  top: -8px;
+  z-index: 20;
+  width: 10px;
+  height: 35px;
+  border-radius: 2px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.slant.controls ul li.volume {
+}
+
+.slant.controls ul li.volume .control {
+  display: inline-block;
+  position: relative;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.slant.controls ul li.volume .control.muted {
+  text-decoration: line-through;
+  color: #cecece;
+}
+
+.slant.controls ul li.volume .panel {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  width: 40px;
+  margin: 5px 0;
+  padding: 3px 0px;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.slant.controls ul li.volume .panel .slider {
+  background: rgb(226, 226, 255);
+}
+
+.slant.controls ul li.volume .panel .slider .handle {
+  display: block;
+  position: absolute;
+  top: -7px;
+  width: 5px;
+  height: 20px;
+  border-radius: 2px;
+  background: #fff;
+  cursor: pointer;
+}
+

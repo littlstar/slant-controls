@@ -8,7 +8,9 @@
   "dependencies": {
     "component/emitter": "*",
     "component/events": "*",
-    "component/domify": "*"
+    "component/domify": "*",
+    "component/raf": "*",
+    "mnmly/drag": "master"
   },
   "development": {
     "littlstar/slant-frame": "*"
