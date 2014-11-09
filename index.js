@@ -72,7 +72,7 @@ function Controls (frame, opts) {
 
   var self = this;
 
-  this.frame = frame;
+  this.frame = frame.render();
   this.el = dom(tpl);
   this.scrubbing = false;
   this.ready = false;
@@ -168,10 +168,6 @@ function Controls (frame, opts) {
     // update volume handle range
     self.vol.range.x[1] = float(getComputedStyle(volumeSlider).width);
 
-    self.vol.setPosition(
-      float(getComputedStyle(volumeSlider).width) * self.frame.video.volume,
-      0
-    );
 
     self.ready = true;
     self.emit('ready');
@@ -207,6 +203,11 @@ function Controls (frame, opts) {
       // update scrub position
       self.scrub.setPosition(x, 0);
     }
+
+    self.vol.setPosition(
+      float(getComputedStyle(volumeSlider).width) * self.frame.video.volume,
+      0
+    );
   });
 }
 
@@ -269,8 +270,6 @@ Controls.prototype.onmuteclick = function (e) {
  */
 
 Controls.prototype.onvolumefocus = function (e) {
-  var panel = this.el.querySelector('.volume .panel');
-  //panel.classList.remove('hidden');
 };
 
 /**
@@ -281,13 +280,6 @@ Controls.prototype.onvolumefocus = function (e) {
  */
 
 Controls.prototype.onvolumeblur = function (e) {
-  var vol = this.el.querySelector('.volume');
-  var panel = vol.querySelector('.panel');
-  if (false == vol.contains(e.target) && vol != e.target) {
-    raf(function () {
-      //panel.classList.add('hidden');
-    });
-  }
 };
 
 /**
