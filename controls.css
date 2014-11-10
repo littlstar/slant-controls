@@ -122,9 +122,9 @@
   cursor: pointer;
   opacity: 0.7;
 
-  webkit-transition: height 0.1s;
-  -moz-transition: height 0.1s;
-  transition: height 0.1s;
+  webkit-transition: height 1s;
+  -moz-transition: height 1s;
+  transition: height 1s;
 
   webkit-transition: opacity 0.1s;
   -moz-transition: opacity 0.1s;
@@ -156,7 +156,11 @@
   border-radius: 2px;
 }
 
-.slant.controls ul li.progress .bar .gutter {
+.slant.controls ul li.progress .bar .played,
+.slant.controls ul li.progress .bar .loaded {
+  -moz-transition: width 0.08s;
+  webkit-transition: width 0.08s;
+  transition: width 0.08s;
 }
 
 .slant.controls ul li.progress .bar .played {
