@@ -1,6 +1,6 @@
 {
   "name": "slant-controls",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Core video controls API for slant",
   "scripts": ["index.js"],
   "styles": ["controls.css"],
