@@ -30,10 +30,17 @@
       var Frame = require('slant-frame');
       var Controls = require('slant-controls');
 
-      var frame = new Frame(el, {src: 'test.webm'});
+      var frame = new Frame(el, {
+        src: 'test.webm',
+        width: 1000,
+        height: 500
+      });
+
       var controls = new Controls(frame, {});
 
       el.appendChild(controls.el);
+
+      frame.render();
     </script>
   </body>
 </html>

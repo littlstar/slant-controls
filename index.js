@@ -92,6 +92,7 @@ function Controls (frame, opts) {
   this.events.bind('click .volume .control', 'onmuteclick');
   this.events.bind('mouseover .volume', 'onvolumefocus');
   this.events.bind('mouseout .volume', 'onvolumeblur');
+  this.events.bind('click .volume .panel', 'onvolumeclick');
 
   var progress = this.el.querySelector('.progress');
   var played = progress.querySelector('.played');
@@ -107,6 +108,7 @@ function Controls (frame, opts) {
   var volumePanel = volume.querySelector('.panel');
   var volumeSlider = volume.querySelector('.slider');
   var volumeHandle = volume.querySelector('.handle');
+  var volumeLevel = volume.querySelector('.level');
 
   this.vol = drag(volumeHandle, {
     smooth: true,
@@ -138,6 +140,10 @@ function Controls (frame, opts) {
     var x = self.vol.x;
     var w = float(getComputedStyle(volumeSlider, null).width);
     var p = x / w;
+    var v = w * self.frame.video.volume;
+    raf(function () {
+      volumeLevel.style.width = v +'px';
+    });
     self.frame.volume(p);
     self.emit('volume');
   });
@@ -168,7 +174,7 @@ function Controls (frame, opts) {
     // update volume handle range
     self.vol.range.x[1] = float(getComputedStyle(volumeSlider).width);
 
-
+    update();
     self.ready = true;
     self.emit('ready');
   });
@@ -184,17 +190,21 @@ function Controls (frame, opts) {
 
     // update scrub range
     self.scrub.range.x[1] = x;
+
   });
 
   this.frame.on('timeupdate', function (e) {
+    // update played progress bar
+    played.style.width = e.percent + '%';
+    update();
+  });
+
+  function update () {
     var dur = parseDuration(self.frame.state.time);
     var x = 0;
 
     // update current time
     current.innerHTML = formatDuration(dur);
-
-    // update played progress bar
-    played.style.width = e.percent + '%';
 
     // get current x position for scrubber
     x = played.offsetWidth - 2; //
@@ -204,11 +214,15 @@ function Controls (frame, opts) {
       self.scrub.setPosition(x, 0);
     }
 
-    self.vol.setPosition(
-      float(getComputedStyle(volumeSlider).width) * self.frame.video.volume,
-      0
+    var v = (
+      float(getComputedStyle(volumeSlider).width) * self.frame.video.volume
     );
-  });
+
+    raf(function () {
+      self.vol.setPosition(v, 0);
+      volumeLevel.style.width = v +'px';
+    });
+  }
 }
 
 // inherit from emitter
@@ -280,6 +294,24 @@ Controls.prototype.onvolumefocus = function (e) {
  */
 
 Controls.prototype.onvolumeblur = function (e) {
+};
+
+/**
+ * `onvolumeclick' event handler
+ *
+ * @api private
+ * @param {Event} e
+ */
+
+Controls.prototype.onvolumeclick = function (e) {
+  var panel = this.el.querySelector('.volume .panel');
+  var style = getComputedStyle(panel, null);
+  var x = e.offsetX;
+  var w = float(style.width);
+  var v = x / w;
+
+  this.volume(v);
+  this.emit('scrubend', e);
 };
 
 /**
