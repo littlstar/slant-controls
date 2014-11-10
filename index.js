@@ -310,6 +310,10 @@ Controls.prototype.onvolumeclick = function (e) {
   var w = float(style.width);
   var v = x / w;
 
+  if (panel.querySelector('.handle') == e.target) {
+    return false;
+  }
+
   this.volume(v);
   this.emit('scrubend', e);
 };

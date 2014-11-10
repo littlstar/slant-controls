@@ -107,7 +107,7 @@
 }
 
 .slant.controls ul li.progress {
-  width: 64%;
+  width: 60%;
   margin: 0;
   margin-right: 5px;
   vertical-align: middle;
@@ -195,6 +195,13 @@
 .slant.controls ul li.time {
   width: 15%;
   text-align: center;
+  vertical-align: middle;
+}
+
+.slant.controls ul li.time span {
+  display: inline-block;
+  position: relative;
+  font-size: 11px;
 }
 
 .slant.controls ul li.volume {
@@ -213,7 +220,8 @@
 .slant.controls ul li.volume .control {
   display: inline-block;
   position: relative;
-  width: 25%;
+  width: 40%;
+  max-width: 30px;
   cursor: pointer;
   vertical-align: middle;
 }
@@ -227,7 +235,7 @@
   display: inline-block;
   position: relative;
   vertical-align: middle;
-  width: 60%;
+  width: 50%;
   margin: 5px 0;
   background: #fff;
   border-radius: 2px;
