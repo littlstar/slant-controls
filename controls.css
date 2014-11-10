@@ -40,16 +40,10 @@
 
 .slant.controls {
   display: block;
-  position: relative;
-  bottom: 50px;
-  width: 80%;
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
   margin: 0 auto;
-  border-radius: 5px;
-  color: #fff;
-  font-weight: 100;
-  font-family: Helvetica;
-  font-size: 14px;
-  background: rgba(0, 0, 0, 0.85);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -64,9 +58,16 @@
 .slant.controls ul {
   display: block;
   position: relative;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   list-style: none;
+  color: #fff;
+  font-weight: 100;
+  font-family: Helvetica;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.85);
+  width: 80%;
+  border-radius: 5px;
 }
 
 .slant.controls ul li {
