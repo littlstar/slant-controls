@@ -76,12 +76,14 @@ function Controls (frame, opts) {
   this.el = dom(tpl);
   this.scrubbing = false;
   this.ready = false;
+  this.paused = true;
   this.muted = frame.video.muted;
   this.events = events(this.el, this);
   this.events.bind('click', 'onclick');
 
   // play/pause handles
   this.events.bind('click .playpause .play', 'onplayclick');
+  this.events.bind('click .playpause .replay', 'onplayclick');
   this.events.bind('click .playpause .pause', 'onplayclick');
 
   // track scrubbing
@@ -194,9 +196,23 @@ function Controls (frame, opts) {
   });
 
   this.frame.on('timeupdate', function (e) {
+    var replay = self.el.querySelector('.playpause .replay');
     // update played progress bar
     played.style.width = e.percent + '%';
+    replay.classList.add('hidden');
     update();
+  });
+
+  this.frame.on('end', function () {
+    var play = self.el.querySelector('.playpause .play');
+    var pause = self.el.querySelector('.playpause .pause');
+    var replay = self.el.querySelector('.playpause .replay');
+
+    play.classList.add('hidden');
+    pause.classList.add('hidden');
+    replay.classList.remove('hidden');
+
+    self.paused = true;
   });
 
   function update () {
@@ -251,11 +267,17 @@ Controls.prototype.onclick = function (e) {
 
 Controls.prototype.onplayclick = function (e) {
   var play = this.el.querySelector('.play');
+  var replay = this.el.querySelector('.replay');
   var paused = Boolean(this.frame.video.paused);
+
   e.preventDefault();
 
   this.toggle();
   this.paused = Boolean(this.frame.video.paused);
+
+  if (e.target == replay) {
+    this.emit('replay');
+  }
 };
 
 /**
@@ -334,6 +356,9 @@ Controls.prototype.onscrubclick = function (e) {
 
   this.scrubbing = false;
   this.seek(s);
+  if (true == this.paused) {
+    this.play();
+  }
   this.emit('scrubend', e);
 };
 
@@ -346,6 +371,7 @@ Controls.prototype.onscrubclick = function (e) {
 
 Controls.prototype.play = function () {
   this.el.querySelector('.play').classList.add('hidden');
+  this.el.querySelector('.replay').classList.add('hidden');
   this.el.querySelector('.pause').classList.remove('hidden');
   this.frame.play();
   this.emit('play');
