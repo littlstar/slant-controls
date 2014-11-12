@@ -185,7 +185,9 @@ function Controls (frame, opts) {
     var x = 0;
 
     // update progress bar
-    loaded.style.width = e.percent + '%';
+    raf(function () {
+      loaded.style.width = e.percent + '%';
+    });
 
     // new scrub range
     x = loaded.offsetWidth;
@@ -198,7 +200,9 @@ function Controls (frame, opts) {
   this.frame.on('timeupdate', function (e) {
     var replay = self.el.querySelector('.playpause .replay');
     // update played progress bar
-    played.style.width = e.percent + '%';
+    raf(function () {
+      played.style.width = e.percent + '%';
+    });
     replay.classList.add('hidden');
     update();
   });
