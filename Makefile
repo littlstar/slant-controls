@@ -6,7 +6,7 @@ components:
 	component install
 
 dist: components
-	component build -o . -s SlantFrame -n slant-frame
+	component build -o . -s SlantControls -n slant-controls
 
 example: example.html
 example.html: dev

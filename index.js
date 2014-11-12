@@ -143,10 +143,13 @@ function Controls (frame, opts) {
     var w = float(getComputedStyle(volumeSlider, null).width);
     var p = x / w;
     var v = w * self.frame.video.volume;
+
     raf(function () {
       volumeLevel.style.width = v +'px';
     });
+
     self.frame.volume(p);
+
     self.emit('volume');
   });
 
@@ -194,7 +197,6 @@ function Controls (frame, opts) {
 
     // update scrub range
     self.scrub.range.x[1] = x;
-
   });
 
   this.frame.on('timeupdate', function (e) {
@@ -341,7 +343,6 @@ Controls.prototype.onvolumeclick = function (e) {
   }
 
   this.volume(v);
-  this.emit('scrubend', e);
 };
 
 /**
@@ -449,6 +450,7 @@ Controls.prototype.volume = function (vol) {
 
 Controls.prototype.mute = function () {
   this.frame.mute();
+  this.emit('mute');
   return this;
 };
 
@@ -460,6 +462,7 @@ Controls.prototype.mute = function () {
 
 Controls.prototype.unmute = function () {
   this.frame.unmute();
+  this.emit('unmute');
   return this;
 };
 
@@ -471,7 +474,9 @@ Controls.prototype.unmute = function () {
  */
 
 Controls.prototype.seek = function (seconds) {
+  this.emit('beforeseek', seconds);
   this.frame.seek(seconds);
+  this.emit('seek', seconds);
   return this;
 };
 

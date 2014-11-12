@@ -78,7 +78,7 @@
 }
 
 .slant.controls ul li.playpause {
-  width: 7%;
+  width: 10%;
   vertical-align: middle;
 }
 
@@ -102,10 +102,12 @@
 
 .slant.controls ul li.playpause a:hover {
   opacity: 1;
+  background: rgba(206, 206, 206, 0.15);
+  border-radius: 2px;
 }
 
 .slant.controls ul li.playpause a.pause {
-  left: 2%;
+  padding-left: 2%;
 }
 
 .slant.controls ul li.playpause a.replay {
@@ -114,9 +116,10 @@
 }
 
 .slant.controls ul li.progress {
-  width: 60%;
+  width: 58%;
   margin: 0;
-  margin-right: 5px;
+  margin-right: 1%;
+  margin-left: 1%;
   vertical-align: middle;
   background: #fff;
   cursor: pointer;
@@ -204,20 +207,20 @@
 }
 
 .slant.controls ul li.time {
-  width: 12%;
+  width: 10%;
   text-align: center;
-  line-height: 0.8;
+  line-height: 1;
   vertical-align: middle;
 }
 
 .slant.controls ul li.time span {
   display: inline-block;
   position: relative;
-  font-size: 11px;
+  font-size: .7em;
 }
 
 .slant.controls ul li.volume {
-  width: 12%;
+  width: 15%;
   opacity: 0.7;
 
   webkit-transition: opacity 0.1s;
@@ -232,10 +235,10 @@
 .slant.controls ul li.volume .control {
   display: inline-block;
   position: relative;
-  width: 40%;
-  max-width: 30px;
+  width: 10%;
   cursor: pointer;
   vertical-align: middle;
+  font-size: .8em;
 }
 
 .slant.controls ul li.volume .control.muted {
@@ -247,9 +250,8 @@
   display: inline-block;
   position: relative;
   vertical-align: middle;
-  width: 50%;
-  margin: 5px 0;
-  background: #fff;
+  width: 95%;
+  background: #444;
   border-radius: 2px;
   cursor: pointer;
 }
@@ -267,7 +269,7 @@
   z-index: 10;
   width: 100%;
   padding: 3px 0px;
-  background: #444;
+  background: rgb(226, 226, 255);
   border-radius: 2px;
 }
 
@@ -276,9 +278,10 @@
   position: absolute;
   top: -5px;
   z-index: 15;
-  width: 7px;
+  width: 5px;
   height: 15px;
-  margin-left: -3px;
+  margin-left: -1px;
+  margin-right: -7px;
   border-radius: 2px;
   background: #fff;
   cursor: pointer;
