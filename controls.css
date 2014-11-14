@@ -102,8 +102,6 @@
 
 .slant.controls ul li.playpause a:hover {
   opacity: 1;
-  background: rgba(206, 206, 206, 0.15);
-  border-radius: 2px;
 }
 
 .slant.controls ul li.playpause a.pause {
