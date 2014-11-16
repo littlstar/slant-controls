@@ -201,10 +201,12 @@ function Controls (frame, opts) {
 
   this.frame.on('timeupdate', function (e) {
     var replay = self.el.querySelector('.playpause .replay');
+
     // update played progress bar
     raf(function () {
       played.style.width = e.percent + '%';
     });
+
     replay.classList.add('hidden');
     update();
   });
@@ -218,6 +220,14 @@ function Controls (frame, opts) {
     pause.classList.add('hidden');
     replay.classList.remove('hidden');
 
+    self.paused = true;
+  });
+
+  self.frame.on('play', function () {
+    self.paused = false;
+  });
+
+  self.frame.on('pause', function () {
     self.paused = true;
   });
 
@@ -372,14 +382,17 @@ Controls.prototype.onscrubclick = function (e) {
  * the `onplayclick' event handler
  *
  * @api public
+ * @param {Boolean} toggle
  */
 
-Controls.prototype.play = function () {
+Controls.prototype.play = function (toggle) {
   this.el.querySelector('.play').classList.add('hidden');
   this.el.querySelector('.replay').classList.add('hidden');
   this.el.querySelector('.pause').classList.remove('hidden');
-  this.frame.play();
-  this.emit('play');
+  if (true != toggle) {
+    this.frame.play();
+    this.emit('play');
+  }
   return this;
 };
 
@@ -388,13 +401,15 @@ Controls.prototype.play = function () {
  * the `onplayclick' event handler
  *
  * @api public
-
+ * @param {Boolean} toggle
  */
-Controls.prototype.pause = function () {
+Controls.prototype.pause = function (toggle) {
   this.el.querySelector('.pause').classList.add('hidden');
   this.el.querySelector('.play').classList.remove('hidden');
-  this.frame.pause();
-  this.emit('pause');
+  if (true != toggle) {
+    this.frame.pause();
+    this.emit('pause');
+  }
   return this;
 };
 
@@ -404,8 +419,11 @@ Controls.prototype.pause = function () {
  * @api public
  */
 
-Controls.prototype.toggle = function () {
-  return this.frame.video.paused ? this.play() : this.pause();
+Controls.prototype.toggle = function (toggle) {
+  return (
+    this.frame.video.paused ?
+    this.play(toggle) : this.pause(toggle)
+  );
 };
 
 /**
@@ -476,6 +494,9 @@ Controls.prototype.unmute = function () {
 Controls.prototype.seek = function (seconds) {
   this.emit('beforeseek', seconds);
   this.frame.seek(seconds);
+  if (false == this.paused) {
+    this.play();
+  }
   this.emit('seek', seconds);
   return this;
 };
